@@ -18,22 +18,18 @@ int lowlevel = 300;
 int highlevel = 1000;
 int lightThreshold = 600;
 
-/*unsigned int msTolerance = 5;
-unsigned int dotLength = 20;
-unsigned int dashLength = 40;
-unsigned int dddelay = 20;
-unsigned int letterFinishTime = 50;
-unsigned int messageFinishTime = 500;*/
-
 char message[128];
 int messagelen = 0;
 int letter[4];
 int letterlen = 0;
 
-// F0
+// PIN definitions
 int lightReceiver = A5;
 int laser = 3;
 
+// I would have loved to use a hashmap for this,
+// but c doesn't have those easily accessable. Hence
+// the ugly function
 int* charToMorseArray(char ch) {
 
   static int a[4] = {DOT, DASH};
@@ -289,13 +285,6 @@ void setup() {
   lightThreshold = (highlevel + lowlevel) / 2;
   Serial.print("Light threshold is: ");
   Serial.println(lightThreshold);
-  /*Serial.print("Welcome! To use this morse transmission device, just type");
-  Serial.print("your message into the terminal and press ENTER (valid");
-  Serial.print("characters are a-z (lowercase) and SPACE). Messages are");
-  Serial.print("automatically recieved and decoded (although this program");
-  Serial.print("can't send and receive a message at the same time). Calibration");
-  Serial.print("is suggested before use; to begin calibration, type CALIBRATE.");*/
-  
 }
 
 void loop() {
@@ -349,7 +338,6 @@ void loop() {
 
         // the message being sent is done
         if (curStateTime > messageFinishTime && receiving) {
-          //Serial.println("done receiving message");
           printMessageToSerial();
           messagelen = 0;
           receiving = false;
@@ -358,11 +346,8 @@ void loop() {
 
         if (lightWasOn && !receivingLight) {
 
-          //Serial.println("within tolerance:");
-          //Serial.println(withinTolerance(curStateTime, dotLength));
           if (withinTolerance(curStateTime, dotLength)) {
             if (letterlen < 4) {
-              //Serial.println("DOT");
               letter[letterlen] = DOT;
               letterlen++;
             } else {
@@ -372,7 +357,6 @@ void loop() {
           } else {
             if (withinTolerance(curStateTime, dashLength)) {
               if (letterlen < 4) {
-                //Serial.println("DASH");
                 letter[letterlen] = DASH;
                 letterlen++;
               } else {
